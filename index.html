@@ -403,7 +403,7 @@ document.getElementById('dateDisp').textContent = dateStr;
 
 // ── Name persistence ──
 const nameInput = document.getElementById('nameInput');
-nameInput.value = localStorage.getItem('checkin_name') || '';
+nameInput.value = localStorage.getItem('checkin_name') || '山口裕太';
 nameInput.addEventListener('input', () => {
   localStorage.setItem('checkin_name', nameInput.value);
   updatePreview();
