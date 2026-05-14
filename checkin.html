@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="連絡メール">
+<meta name="theme-color" content="#1D9E75">
+<link rel="manifest" href="manifest.json">
+<title>連絡メール作成</title>
+<style>
+:root {
+  --green: #1D9E75;
+  --green-light: #e8f7f2;
+  --blue: #378ADD;
+  --orange: #EF9F27;
+  --red: #E24B4A;
+  --bg: #f5f5f4;
+  --card: #ffffff;
+  --text: #1a1a18;
+  --text2: #6b6b68;
+  --text3: #a0a09c;
+  --border: #e0e0dc;
+  --radius: 14px;
+  --radius-sm: 8px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 16px;
+  line-height: 1.5;
+  padding-bottom: env(safe-area-inset-bottom, 20px);
+}
+
+/* ── Header ── */
+.app-header {
+  background: var(--green);
+  color: #fff;
+  padding: 16px 20px 12px;
+  padding-top: calc(16px + env(safe-area-inset-top, 0px));
+}
+.app-header h1 { font-size: 18px; font-weight: 600; letter-spacing: .02em; }
+.app-header .date { font-size: 13px; opacity: .85; margin-top: 2px; }
+
+/* ── Mode toggle ── */
+.mode-toggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  margin: 16px 16px 0;
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 2px solid var(--green);
+  background: var(--card);
+}
+.mode-btn {
+  padding: 13px 8px;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background .15s, color .15s;
+  color: var(--green);
+  background: transparent;
+  border: none;
+  font-family: inherit;
+  line-height: 1.3;
+}
+.mode-btn small { display: block; font-size: 11px; font-weight: 400; opacity: .75; }
+.mode-btn.active { background: var(--green); color: #fff; }
+
+/* ── Cards ── */
+.card {
+  background: var(--card);
+  border-radius: var(--radius);
+  margin: 12px 16px;
+  padding: 16px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.06);
+}
+.card-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text2);
+  letter-spacing: .08em;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+}
+
+/* ── Score buttons ── */
+.score-group { margin-bottom: 14px; }
+.score-group:last-child { margin-bottom: 0; }
+.score-row-label {
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.score-row-label .icon { font-size: 18px; }
+.score-btns {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+}
+.score-btn {
+  padding: 10px 4px;
+  border-radius: var(--radius-sm);
+  border: 2px solid transparent;
+  text-align: center;
+  cursor: pointer;
+  font-family: inherit;
+  transition: transform .1s, box-shadow .1s;
+  background: #f5f5f4;
+}
+.score-btn:active { transform: scale(.94); }
+.score-btn .num { font-size: 18px; font-weight: 700; }
+.score-btn .lbl { font-size: 9px; line-height: 1.2; margin-top: 2px; color: var(--text2); }
+.score-btn.selected { border-color: currentColor; box-shadow: 0 0 0 3px rgba(0,0,0,.08); }
+.score-btn.selected .lbl { font-weight: 600; }
+
+/* Score colors */
+.sc-5 { color: #1D9E75; background: #e8f7f2; }
+.sc-4 { color: #5BB082; background: #edf7f1; }
+.sc-3 { color: #EF9F27; background: #fef7e6; }
+.sc-2 { color: #D85A30; background: #fdf0ea; }
+.sc-1 { color: #E24B4A; background: #fff0f0; }
+
+/* ── Text inputs ── */
+.field-label {
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 7px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.field-label .optional {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--text3);
+  background: var(--bg);
+  padding: 1px 6px;
+  border-radius: 10px;
+}
+textarea, input[type=text] {
+  width: 100%;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 11px 13px;
+  font-size: 15px;
+  font-family: inherit;
+  color: var(--text);
+  background: var(--bg);
+  outline: none;
+  resize: none;
+  -webkit-appearance: none;
+  transition: border-color .15s;
+}
+textarea:focus, input[type=text]:focus { border-color: var(--green); background: #fff; }
+textarea { min-height: 80px; }
+
+/* ── Preview ── */
+.preview-box {
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 13px;
+  font-size: 13px;
+  line-height: 1.8;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: var(--text2);
+  min-height: 80px;
+}
+
+/* ── Action button ── */
+.action-area {
+  position: sticky;
+  bottom: 0;
+  background: linear-gradient(transparent, var(--bg) 30%);
+  padding: 8px 16px 20px;
+  padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+}
+.send-btn {
+  display: block;
+  width: 100%;
+  padding: 16px;
+  background: var(--green);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: inherit;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(29,158,117,.4);
+  transition: background .15s, transform .1s, box-shadow .1s;
+  letter-spacing: .03em;
+}
+.send-btn:active { transform: scale(.98); box-shadow: 0 2px 6px rgba(29,158,117,.3); }
+
+/* ── Name field ── */
+.name-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 12px 16px 0;
+  background: var(--card);
+  padding: 12px 14px;
+  border-radius: var(--radius);
+  box-shadow: 0 1px 4px rgba(0,0,0,.06);
+}
+.name-row label { font-size: 13px; font-weight: 500; white-space: nowrap; flex-shrink: 0; }
+.name-row input {
+  flex: 1;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 11px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--text);
+  background: var(--bg);
+  outline: none;
+  -webkit-appearance: none;
+}
+.name-row input:focus { border-color: var(--green); background: #fff; }
+
+/* ── Hint ── */
+.hint-bar {
+  margin: 6px 16px 0;
+  font-size: 12px;
+  color: var(--text3);
+  text-align: center;
+  padding: 6px 0;
+}
+
+/* ── Section number badge ── */
+.sec-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--green);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-right: 4px;
+}
+
+.symptom-row { margin-top: 10px; }
+</style>
+</head>
+<body>
+
+<div class="app-header">
+  <h1>📧 連絡メール作成</h1>
+  <div class="date" id="dateDisp">読み込み中…</div>
+</div>
+
+<!-- 名前 -->
+<div class="name-row">
+  <label for="nameInput">お名前</label>
+  <input type="text" id="nameInput" placeholder="山田 太郎" inputmode="text">
+</div>
+
+<!-- モード切替 -->
+<div class="mode-toggle">
+  <button class="mode-btn active" id="btnStart" onclick="setMode('start')">
+    ▶ 開始連絡<small>出勤時</small>
+  </button>
+  <button class="mode-btn" id="btnEnd" onclick="setMode('end')">
+    ⏹ 終了連絡<small>退勤時</small>
+  </button>
+</div>
+
+<!-- ① 体調・メンタル -->
+<div class="card">
+  <div class="card-label" id="sec1Label">今朝の体調・メンタル（5段階）</div>
+  <div style="font-size:12px;color:var(--text3);margin-bottom:12px;">5：非常に良い　〜　1：非常に悪い</div>
+
+  <div class="score-group">
+    <div class="score-row-label">
+      <span class="icon">🏃</span> 体調
+    </div>
+    <div class="score-btns" id="physBtns"></div>
+  </div>
+
+  <div class="score-group">
+    <div class="score-row-label">
+      <span class="icon">🧠</span> メンタル
+    </div>
+    <div class="score-btns" id="mentalBtns"></div>
+  </div>
+
+  <div class="symptom-row">
+    <div class="field-label">
+      症状・補足 <span class="optional">任意</span>
+    </div>
+    <textarea id="symptom" placeholder="例：少し頭痛あり、鼻水が出る など" rows="2"></textarea>
+  </div>
+</div>
+
+<!-- ② 一言 -->
+<div class="card">
+  <div class="field-label">
+    <span class="sec-num">2</span>
+    <span id="sec2Label">本日の意気込み・一言</span>
+  </div>
+  <textarea id="message" placeholder="例：今日も集中して頑張ります！"></textarea>
+</div>
+
+<!-- ③ スタッフ共有 -->
+<div class="card">
+  <div class="field-label">
+    <span class="sec-num">3</span>
+    スタッフへの共有事項 <span class="optional">任意</span>
+  </div>
+  <textarea id="staffNote" placeholder="例：午後から通院のため15時に早退予定 など" rows="2"></textarea>
+</div>
+
+<!-- プレビュー -->
+<div class="card">
+  <div class="card-label">📋 メール内容プレビュー</div>
+  <div class="preview-box" id="preview">内容を入力するとここにプレビューが表示されます</div>
+</div>
+
+<!-- 送信ボタン -->
+<div class="action-area">
+  <button class="send-btn" onclick="openMailto()">
+    📨 メールアプリで開く
+  </button>
+</div>
+
+<div class="hint-bar" id="hintBar">
+  📲 スマートフォンのホーム画面に追加するとアプリのように使えます
+</div>
+
+<script>
+const TO = 'info_susukino_wk@litalico.co.jp';
+const WDAYS = ['日','月','火','水','木','金','土'];
+const SCORES = {
+  5: { label: '非常に良い', color: '#1D9E75', cls: 'sc-5' },
+  4: { label: '良い',       color: '#5BB082', cls: 'sc-4' },
+  3: { label: '普通',       color: '#EF9F27', cls: 'sc-3' },
+  2: { label: '悪い',       color: '#D85A30', cls: 'sc-2' },
+  1: { label: '非常に悪い', color: '#E24B4A', cls: 'sc-1' },
+};
+
+let mode = 'start';
+let physScore = null;
+let mentalScore = null;
+
+const now = new Date();
+const dateStr = `${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日（${WDAYS[now.getDay()]}）`;
+document.getElementById('dateDisp').textContent = dateStr;
+
+const nameInput = document.getElementById('nameInput');
+nameInput.value = localStorage.getItem('checkin_name') || '';
+nameInput.addEventListener('input', () => {
+  localStorage.setItem('checkin_name', nameInput.value);
+  updatePreview();
+});
+
+function renderScoreBtns(containerId, selectedVal, onChange) {
+  const el = document.getElementById(containerId);
+  el.innerHTML = [5,4,3,2,1].map(s => {
+    const sc = SCORES[s];
+    const sel = selectedVal === s;
+    return `<button class="score-btn ${sc.cls}${sel ? ' selected' : ''}"
+      onclick="${onChange}(${s})"
+      style="${sel ? `border-color:${sc.color};` : ''}">
+      <div class="num" style="${sel ? `color:${sc.color};` : ''}">${s}</div>
+      <div class="lbl">${sc.label}</div>
+    </button>`;
+  }).join('');
+}
+
+function setPhys(s) { physScore = s; renderScoreBtns('physBtns', physScore, 'setPhys'); updatePreview(); }
+function setMental(s) { mentalScore = s; renderScoreBtns('mentalBtns', mentalScore, 'setMental'); updatePreview(); }
+
+function setMode(m) {
+  mode = m;
+  document.getElementById('btnStart').classList.toggle('active', m === 'start');
+  document.getElementById('btnEnd').classList.toggle('active', m === 'end');
+  if (m === 'start') {
+    document.getElementById('sec1Label').textContent = '今朝の体調・メンタル（5段階）';
+    document.getElementById('sec2Label').textContent = '本日の意気込み・一言';
+    document.getElementById('message').placeholder = '例：今日も集中して頑張ります！';
+  } else {
+    document.getElementById('sec1Label').textContent = '勤務終了後の体調・メンタル（5段階）';
+    document.getElementById('sec2Label').textContent = '一言';
+    document.getElementById('message').placeholder = '例：今日はよく集中できました。お疲れ様でした。';
+  }
+  updatePreview();
+}
+
+function buildBody() {
+  const name = nameInput.value.trim();
+  const symptom = document.getElementById('symptom').value.trim();
+  const msg = document.getElementById('message').value.trim();
+  const staff = document.getElementById('staffNote').value.trim();
+  const physLabel   = physScore   ? `${physScore}（${SCORES[physScore].label}）`   : '（未選択）';
+  const mentalLabel = mentalScore ? `${mentalScore}（${SCORES[mentalScore].label}）` : '（未選択）';
+  let body = '';
+  if (mode === 'start') {
+    body += `【開始連絡】${dateStr}${name ? '　' + name : ''}\n\n`;
+    body += `お世話になっております。\n本日の開始連絡をお送りします。\n\n`;
+    body += `1. 今朝の体調・メンタル（5段階）\n（5：非常に良い 〜 1：非常に悪い）\n`;
+    body += `∟体調：${physLabel}\n∟メンタル：${mentalLabel}\n`;
+    if (symptom) body += `∟症状・補足：${symptom}\n`;
+    body += `\n2. 本日の意気込み・一言：\n${msg || '（未入力）'}\n`;
+    body += `\n3. スタッフへの共有事項：\n${staff || 'なし'}\n`;
+  } else {
+    body += `【終了連絡】${dateStr}${name ? '　' + name : ''}\n\n`;
+    body += `お世話になっております。\n本日の終了連絡をお送りします。\n\n`;
+    body += `1. 勤務終了後の体調・メンタル（5段階）\n（5：非常に良い 〜 1：非常に悪い）\n`;
+    body += `∟体調：${physLabel}\n∟メンタル：${mentalLabel}\n`;
+    if (symptom) body += `∟症状・補足：${symptom}\n`;
+    body += `\n2. 一言：\n${msg || '（未入力）'}\n`;
+    body += `\n3. スタッフへの共有事項：\n${staff || 'なし'}\n`;
+  }
+  body += `\nよろしくお願いいたします。`;
+  return body;
+}
+
+function buildSubject() {
+  const name = nameInput.value.trim();
+  const type = mode === 'start' ? '開始連絡' : '終了連絡';
+  const md = `${now.getMonth()+1}/${now.getDate()}`;
+  return `【${type}】${md}${name ? '　' + name : ''}`;
+}
+
+function updatePreview() {
+  document.getElementById('preview').textContent = buildBody();
+}
+
+function openMailto() {
+  if (!physScore || !mentalScore) {
+    alert('体調とメンタルの評価を選択してください。');
+    return;
+  }
+  const subject = encodeURIComponent(buildSubject());
+  const body = encodeURIComponent(buildBody());
+  window.location.href = `mailto:${TO}?subject=${subject}&body=${body}`;
+}
+
+['symptom','message','staffNote'].forEach(id => {
+  document.getElementById(id).addEventListener('input', updatePreview);
+});
+
+renderScoreBtns('physBtns', physScore, 'setPhys');
+renderScoreBtns('mentalBtns', mentalScore, 'setMental');
+updatePreview();
+
+const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+const isStandalone = window.navigator.standalone;
+if (isIOS && !isStandalone) {
+  document.getElementById('hintBar').innerHTML =
+    '📲 Safari で「ホーム画面に追加」するとアプリとして使えます';
+}
+</script>
+</body>
+</html>
