@@ -14,6 +14,9 @@
 :root {
   --green: #1D9E75;
   --green-light: #e8f7f2;
+  --blue: #378ADD;
+  --orange: #EF9F27;
+  --red: #E24B4A;
   --bg: #f5f5f4;
   --card: #ffffff;
   --text: #1a1a18;
@@ -33,6 +36,8 @@ body {
   line-height: 1.5;
   padding-bottom: env(safe-area-inset-bottom, 20px);
 }
+
+/* ── Header ── */
 .app-header {
   background: var(--green);
   color: #fff;
@@ -41,9 +46,12 @@ body {
 }
 .app-header h1 { font-size: 18px; font-weight: 600; letter-spacing: .02em; }
 .app-header .date { font-size: 13px; opacity: .85; margin-top: 2px; }
+
+/* ── Mode toggle ── */
 .mode-toggle {
   display: grid;
   grid-template-columns: 1fr 1fr;
+  gap: 0;
   margin: 16px 16px 0;
   border-radius: var(--radius);
   overflow: hidden;
@@ -64,7 +72,12 @@ body {
   line-height: 1.3;
 }
 .mode-btn small { display: block; font-size: 11px; font-weight: 400; opacity: .75; }
-.mode-btn.active { background: var(--green); color: #fff; }
+.mode-btn.active {
+  background: var(--green);
+  color: #fff;
+}
+
+/* ── Cards ── */
 .card {
   background: var(--card);
   border-radius: var(--radius);
@@ -80,6 +93,8 @@ body {
   margin-bottom: 10px;
   text-transform: uppercase;
 }
+
+/* ── Score buttons ── */
 .score-group { margin-bottom: 14px; }
 .score-group:last-child { margin-bottom: 0; }
 .score-row-label {
@@ -111,11 +126,15 @@ body {
 .score-btn .lbl { font-size: 9px; line-height: 1.2; margin-top: 2px; color: var(--text2); }
 .score-btn.selected { border-color: currentColor; box-shadow: 0 0 0 3px rgba(0,0,0,.08); }
 .score-btn.selected .lbl { font-weight: 600; }
+
+/* Score colors */
 .sc-5 { color: #1D9E75; background: #e8f7f2; }
 .sc-4 { color: #5BB082; background: #edf7f1; }
 .sc-3 { color: #EF9F27; background: #fef7e6; }
 .sc-2 { color: #D85A30; background: #fdf0ea; }
 .sc-1 { color: #E24B4A; background: #fff0f0; }
+
+/* ── Text inputs ── */
 .field-label {
   font-size: 14px;
   font-weight: 500;
@@ -148,6 +167,8 @@ textarea, input[type=text] {
 }
 textarea:focus, input[type=text]:focus { border-color: var(--green); background: #fff; }
 textarea { min-height: 80px; }
+
+/* ── Preview ── */
 .preview-box {
   background: var(--bg);
   border: 1.5px solid var(--border);
@@ -160,6 +181,8 @@ textarea { min-height: 80px; }
   color: var(--text2);
   min-height: 80px;
 }
+
+/* ── Action button ── */
 .action-area {
   position: sticky;
   bottom: 0;
@@ -185,6 +208,9 @@ textarea { min-height: 80px; }
   letter-spacing: .03em;
 }
 .send-btn:active { transform: scale(.98); box-shadow: 0 2px 6px rgba(29,158,117,.3); }
+.send-btn:disabled { background: #aaa; box-shadow: none; }
+
+/* ── Sub buttons ── */
 .sub-btn {
   display: block;
   width: 100%;
@@ -201,6 +227,8 @@ textarea { min-height: 80px; }
   transition: background .15s, transform .1s;
 }
 .sub-btn:active { transform: scale(.97); background: var(--green-light); }
+
+/* ── Name field ── */
 .name-row {
   display: flex;
   align-items: center;
@@ -225,6 +253,8 @@ textarea { min-height: 80px; }
   -webkit-appearance: none;
 }
 .name-row input:focus { border-color: var(--green); background: #fff; }
+
+/* ── Hint ── */
 .hint-bar {
   margin: 6px 16px 0;
   font-size: 12px;
@@ -232,6 +262,8 @@ textarea { min-height: 80px; }
   text-align: center;
   padding: 6px 0;
 }
+
+/* ── Section number badge ── */
 .sec-num {
   display: inline-flex;
   align-items: center;
@@ -246,6 +278,8 @@ textarea { min-height: 80px; }
   flex-shrink: 0;
   margin-right: 4px;
 }
+
+/* ── Symptom inline ── */
 .symptom-row { margin-top: 10px; }
 </style>
 </head>
@@ -256,11 +290,13 @@ textarea { min-height: 80px; }
   <div class="date" id="dateDisp">読み込み中…</div>
 </div>
 
+<!-- 名前 -->
 <div class="name-row">
   <label for="nameInput">お名前</label>
   <input type="text" id="nameInput" placeholder="山田 太郎" inputmode="text">
 </div>
 
+<!-- モード切替 -->
 <div class="mode-toggle">
   <button class="mode-btn active" id="btnStart" onclick="setMode('start')">
     ▶ 開始連絡<small>出勤時</small>
@@ -270,21 +306,29 @@ textarea { min-height: 80px; }
   </button>
 </div>
 
+<!-- ① 体調・メンタル -->
 <div class="card">
   <div class="card-label" id="sec1Label">今朝の体調・メンタル（5段階）</div>
   <div style="font-size:12px;color:var(--text3);margin-bottom:12px;">5：非常に良い　〜　1：非常に悪い</div>
+
   <div class="score-group">
     <div class="score-row-label">
       <span class="icon">🏃</span> 体調
     </div>
-    <div class="score-btns" id="physBtns"></div>
+    <div class="score-btns" id="physBtns">
+      <!-- rendered by JS -->
+    </div>
   </div>
+
   <div class="score-group">
     <div class="score-row-label">
       <span class="icon">🧠</span> メンタル
     </div>
-    <div class="score-btns" id="mentalBtns"></div>
+    <div class="score-btns" id="mentalBtns">
+      <!-- rendered by JS -->
+    </div>
   </div>
+
   <div class="symptom-row">
     <div class="field-label">
       症状・補足 <span class="optional">任意</span>
@@ -293,6 +337,7 @@ textarea { min-height: 80px; }
   </div>
 </div>
 
+<!-- ② 一言 -->
 <div class="card">
   <div class="field-label">
     <span class="sec-num">2</span>
@@ -301,6 +346,7 @@ textarea { min-height: 80px; }
   <textarea id="message" placeholder="例：今日も集中して頑張ります！"></textarea>
 </div>
 
+<!-- ③ スタッフ共有 -->
 <div class="card">
   <div class="field-label">
     <span class="sec-num">3</span>
@@ -309,17 +355,19 @@ textarea { min-height: 80px; }
   <textarea id="staffNote" placeholder="例：午後から通院のため15時に早退予定 など" rows="2"></textarea>
 </div>
 
+<!-- プレビュー -->
 <div class="card">
   <div class="card-label">📋 メール内容プレビュー</div>
   <div class="preview-box" id="preview">内容を入力するとここにプレビューが表示されます</div>
 </div>
 
+<!-- 送信ボタン -->
 <div class="action-area">
-  <button class="send-btn" onclick="openGmail()">
+  <button class="send-btn" id="gmailBtn" onclick="openGmail()">
     📨 Gmailで作成する
   </button>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;">
-    <button class="sub-btn" onclick="copyBody()">
+    <button class="sub-btn" onclick="copyBody()" id="copyBtn">
       📋 本文をコピー
     </button>
     <button class="sub-btn" onclick="openMailto()">
@@ -348,10 +396,12 @@ let mode = 'start';
 let physScore = null;
 let mentalScore = null;
 
+// ── Date display ──
 const now = new Date();
 const dateStr = `${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日（${WDAYS[now.getDay()]}）`;
 document.getElementById('dateDisp').textContent = dateStr;
 
+// ── Name persistence ──
 const nameInput = document.getElementById('nameInput');
 nameInput.value = localStorage.getItem('checkin_name') || '';
 nameInput.addEventListener('input', () => {
@@ -359,6 +409,7 @@ nameInput.addEventListener('input', () => {
   updatePreview();
 });
 
+// ── Render score buttons ──
 function renderScoreBtns(containerId, selectedVal, onChange) {
   const el = document.getElementById(containerId);
   el.innerHTML = [5,4,3,2,1].map(s => {
@@ -376,10 +427,12 @@ function renderScoreBtns(containerId, selectedVal, onChange) {
 function setPhys(s) { physScore = s; renderScoreBtns('physBtns', physScore, 'setPhys'); updatePreview(); }
 function setMental(s) { mentalScore = s; renderScoreBtns('mentalBtns', mentalScore, 'setMental'); updatePreview(); }
 
+// ── Mode switch ──
 function setMode(m) {
   mode = m;
   document.getElementById('btnStart').classList.toggle('active', m === 'start');
   document.getElementById('btnEnd').classList.toggle('active', m === 'end');
+
   if (m === 'start') {
     document.getElementById('sec1Label').textContent = '今朝の体調・メンタル（5段階）';
     document.getElementById('sec2Label').textContent = '本日の意気込み・一言';
@@ -392,46 +445,53 @@ function setMode(m) {
   updatePreview();
 }
 
+// ── Build email body ──
 function buildBody() {
-  const name = nameInput.value.trim();
   const symptom = document.getElementById('symptom').value.trim();
   const msg = document.getElementById('message').value.trim();
   const staff = document.getElementById('staffNote').value.trim();
+
   const physLabel   = physScore   ? `${physScore}（${SCORES[physScore].label}）`   : '（未選択）';
   const mentalLabel = mentalScore ? `${mentalScore}（${SCORES[mentalScore].label}）` : '（未選択）';
-  let body = '';
+
+  const sep = '---------------------';
+  let body = `LITALICOすすきのスタッフ各位\n\nお疲れさまです。山口です。\n\n`;
+
   if (mode === 'start') {
-    body += `【開始連絡】${dateStr}${name ? '　' + name : ''}\n\n`;
-    body += `お世話になっております。\n本日の開始連絡をお送りします。\n\n`;
-    body += `1. 今朝の体調・メンタル（5段階）\n（5：非常に良い 〜 1：非常に悪い）\n`;
-    body += `∟体調：${physLabel}\n∟メンタル：${mentalLabel}\n`;
-    if (symptom) body += `∟症状・補足：${symptom}\n`;
+    body += `本日の開始連絡をお送りします。\n${sep}\n`;
+    body += `1. 今朝の体調・メンタル（5：非常に良い 〜 1：非常に悪い）\n`;
+    body += `　体調：${physLabel}\n`;
+    body += `　メンタル：${mentalLabel}\n`;
+    if (symptom) body += `　症状・補足：${symptom}\n`;
     body += `\n2. 本日の意気込み・一言：\n${msg || '（未入力）'}\n`;
     body += `\n3. スタッフへの共有事項：\n${staff || 'なし'}\n`;
   } else {
-    body += `【終了連絡】${dateStr}${name ? '　' + name : ''}\n\n`;
-    body += `お世話になっております。\n本日の終了連絡をお送りします。\n\n`;
-    body += `1. 勤務終了後の体調・メンタル（5段階）\n（5：非常に良い 〜 1：非常に悪い）\n`;
-    body += `∟体調：${physLabel}\n∟メンタル：${mentalLabel}\n`;
-    if (symptom) body += `∟症状・補足：${symptom}\n`;
+    body += `本日の終了連絡をお送りします。\n${sep}\n`;
+    body += `1. 勤務終了後の体調・メンタル（5：非常に良い 〜 1：非常に悪い）\n`;
+    body += `　体調：${physLabel}\n`;
+    body += `　メンタル：${mentalLabel}\n`;
+    if (symptom) body += `　症状・補足：${symptom}\n`;
     body += `\n2. 一言：\n${msg || '（未入力）'}\n`;
     body += `\n3. スタッフへの共有事項：\n${staff || 'なし'}\n`;
   }
-  body += `\nよろしくお願いいたします。`;
+
+  body += `${sep}\n\nよろしくお願いいたします。\n\n`;
+  body += `==============\n山口 裕太 / Yuta Yamaguchi\nyam39.gu@gmail.com`;
   return body;
 }
 
 function buildSubject() {
   const name = nameInput.value.trim();
   const type = mode === 'start' ? '開始連絡' : '終了連絡';
-  const md = `${now.getMonth()+1}/${now.getDate()}`;
-  return `【${type}】${md}${name ? '　' + name : ''}`;
+  return `【${type}】${dateStr}${name ? '：' + name : ''}`;
 }
 
+// ── Preview update ──
 function updatePreview() {
   document.getElementById('preview').textContent = buildBody();
 }
 
+// ── Validate ──
 function validate() {
   if (!physScore || !mentalScore) {
     alert('体調とメンタルの評価を選択してください。');
@@ -440,7 +500,7 @@ function validate() {
   return true;
 }
 
-// Gmail iOS アプリURL → 失敗時はウェブ版にフォールバック
+// ── Gmail compose URL（改行が確実に反映される） ──
 function openGmail() {
   if (!validate()) return;
   const subject = encodeURIComponent(buildSubject());
@@ -450,11 +510,13 @@ function openGmail() {
   const start = Date.now();
   window.location.href = gmailApp;
   setTimeout(() => {
-    if (Date.now() - start < 500) window.open(gmailWeb, '_blank');
+    if (Date.now() - start < 500) {
+      window.open(gmailWeb, '_blank');
+    }
   }, 300);
 }
 
-// クリップボードにコピー（最も確実な方法）
+// ── クリップボードにコピー ──
 function copyBody() {
   if (!validate()) return;
   const text = buildBody();
@@ -481,6 +543,7 @@ function showCopied() {
   setTimeout(() => { el.textContent = ''; }, 4000);
 }
 
+// ── Open mailto（Gmail以外のメールアプリ用） ──
 function openMailto() {
   if (!validate()) return;
   const subject = encodeURIComponent(buildSubject());
@@ -488,15 +551,20 @@ function openMailto() {
   window.location.href = `mailto:${TO}?subject=${subject}&body=${body}`;
 }
 
+// ── Input listeners ──
 ['symptom','message','staffNote'].forEach(id => {
   document.getElementById(id).addEventListener('input', updatePreview);
 });
 
+// ── Initial render ──
 renderScoreBtns('physBtns', physScore, 'setPhys');
 renderScoreBtns('mentalBtns', mentalScore, 'setMental');
 updatePreview();
 
-if (/iphone|ipad|ipod/i.test(navigator.userAgent) && !window.navigator.standalone) {
+// ── iOS PWA hint ──
+const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+const isStandalone = window.navigator.standalone;
+if (isIOS && !isStandalone) {
   document.getElementById('hintBar').innerHTML =
     '📲 Safari で「ホーム画面に追加」するとアプリとして使えます';
 }
