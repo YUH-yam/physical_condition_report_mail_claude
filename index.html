@@ -455,7 +455,7 @@ function buildBody() {
   const mentalLabel = mentalScore ? `${mentalScore}（${SCORES[mentalScore].label}）` : '（未選択）';
 
   const sep = '---------------------';
-  let body = `LITALICOすすきのスタッフ各位\n\nお疲れさまです。山口です。\n\n`;
+  let body = `LITALICOすすきの\nスタッフ各位\n\nお疲れさまです。山口です。\n\n`;
 
   if (mode === 'start') {
     body += `本日の開始連絡をお送りします。\n${sep}\n`;
@@ -483,7 +483,8 @@ function buildBody() {
 function buildSubject() {
   const name = nameInput.value.trim();
   const type = mode === 'start' ? '開始連絡' : '終了連絡';
-  return `【${type}】${dateStr}${name ? '：' + name : ''}`;
+  const subjectDate = `${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日(${WDAYS[now.getDay()]})`;
+  return `【${type}】${subjectDate}${name ? '_' + name : ''}`;
 }
 
 // ── Preview update ──
@@ -500,7 +501,7 @@ function validate() {
   return true;
 }
 
-// ── Gmail compose URL（改行が確実に反映される） ──
+// ── Gmail compose URL ──
 function openGmail() {
   if (!validate()) return;
   const subject = encodeURIComponent(buildSubject());
@@ -543,7 +544,7 @@ function showCopied() {
   setTimeout(() => { el.textContent = ''; }, 4000);
 }
 
-// ── Open mailto（Gmail以外のメールアプリ用） ──
+// ── Open mailto ──
 function openMailto() {
   if (!validate()) return;
   const subject = encodeURIComponent(buildSubject());
